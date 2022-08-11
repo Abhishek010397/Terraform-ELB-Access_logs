@@ -4,10 +4,16 @@ name: 'Terraform-Workflow'
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        type: environment
+      ENV:
+        type: string
         required: true
         default: sandbox
+      LoadBalancerArn:
+        type: string
+        required: true
+
+env:
+  AWS_REGION: us-east-1
 
 jobs:
   provision-s3-bucket:
@@ -26,4 +32,25 @@ jobs:
     - name: Run Terraform
       uses: ./.github/actions/terraform
       with:
-        ENV:  ${{ github.event.inputs.environment }}
+        ENV:  ${{ github.event.inputs.ENV }}
+  
+  change-lb-attributes:
+    name: 'Change LoadBalancers Attributes'
+    runs-on: ubuntu-latest
+    needs: provision-s3-bucket
+    environment: production
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Change LoadBalancer Attributes
+      id: change-attributes
+      run: |
+        aws elbv2 modify-load-balancer-attributes --load-balancer-arn ${{ inputs.LoadBalancerArn }} --attributes Key=access_logs.s3.enabled,Value=true Key=access_logs.s3.bucket,Value=applicationloadbalancerlogs-${{ inputs.ENV }} Key=access_logs.s3.prefix,Value=ELB-logs

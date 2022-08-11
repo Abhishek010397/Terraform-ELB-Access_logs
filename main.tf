@@ -10,7 +10,7 @@ terraform {
     organization = "your-organisation"
 
     workspaces {
-      name = "gh-actions"
+      name = "your-workspace-name"
     }
   }
 }
