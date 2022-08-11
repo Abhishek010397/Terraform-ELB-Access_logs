@@ -1,0 +1,17 @@
+name: run-terraform
+description: Execution Steps for Terraform
+inputs:
+  ENV:
+    description: "Name of the ENVIRONMENT"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Init,Plan,Apply Terraform
+      shell : bash
+      run: |
+        terraform init
+        export TF_LOG=DEBUG
+        terraform plan --var-file="${{ inputs.ENV }}.tfvars" -input=false
+        terraform apply --var-file="${{ inputs.ENV }}.tfvars" -auto-approve -input=false

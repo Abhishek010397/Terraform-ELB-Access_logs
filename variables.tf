@@ -18,10 +18,6 @@ variable "bucket_rule_expiration_days" {
   type = number
 }
 
-variable "bucket_policy_resource" {
-  type = string
-}
-
 variable "bucket_rule_prefix" {
   type = string
 }
