@@ -4,6 +4,15 @@ inputs:
   ENV:
     description: "Name of the ENVIRONMENT"
     required: true
+  aws-access-key-id: 
+    description: "AWS Access Keys"
+    required: true
+  aws-secret-access-key:
+    description: "AWS Secret Keys"
+    required: true
+  aws-region: 
+    description: "AWS Region"
+    required: true
 
 runs:
   using: "composite"
@@ -11,7 +20,7 @@ runs:
     - name: Init,Plan,Apply Terraform
       shell : bash
       run: |
-        terraform init
+        terraform init -backend-config="access_key=${{ inputs.aws-access-key-id }}" -backend-config="secret_key=${{ inputs.aws-secret-access-key }}"
         export TF_LOG=DEBUG
         terraform plan --var-file="${{ inputs.ENV }}.tfvars" -input=false
         terraform apply --var-file="${{ inputs.ENV }}.tfvars" -auto-approve -input=false

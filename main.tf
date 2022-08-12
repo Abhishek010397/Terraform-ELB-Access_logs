@@ -1,23 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "~> 4.0"
-    }
-  }
-
-  cloud {
-    organization = "your-organisation"
-
-    workspaces {
-      name = "your-workspace-name"
-    }
-  }
-}
-
-provider "aws" {
-  region = "us-east-1"
-}
 
 module "s3_bucket_elb_logs" {
   source                      = "./module/s3_bucket_logs"
